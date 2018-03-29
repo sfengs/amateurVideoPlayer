@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import c.seven.amateurvideoplayer.AmateurUtils;
 import c.seven.amateurvideoplayer.R;
 import c.seven.amateurvideoplayer.ScreenSensor;
 import c.seven.amateurvideoplayer.VideoBean;
@@ -136,6 +137,17 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlViewCall
             }
             uiControlView.setScreenModel(screenModel);
         }
+    }
 
+    public boolean onBackPressed() {
+        if (currentScreen == ScreenModel.FULL) {
+            screenChange(ScreenModel.HALF);
+            return true;
+        } else if (currentScreen == ScreenModel.HALF) {
+            if (AmateurUtils.isFinishing(mContext)) {
+                AmateurUtils.finish(mContext);
+            }
+        }
+        return false;
     }
 }

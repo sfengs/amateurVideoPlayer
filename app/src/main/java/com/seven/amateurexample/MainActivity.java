@@ -33,4 +33,12 @@ public class MainActivity extends Activity {
         super.onPause();
         videoPlayer.onPause();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (videoPlayer.onBackPressed()) {
+            return;
+        }
+        super.onBackPressed();
+    }
 }

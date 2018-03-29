@@ -33,4 +33,10 @@ public class AmateurUtils {
         }
         return false;
     }
+
+    public static void finish(Context context) {
+        if (context != null && context instanceof Activity) {
+            ((Activity) context).finish();
+        }
+    }
 }
