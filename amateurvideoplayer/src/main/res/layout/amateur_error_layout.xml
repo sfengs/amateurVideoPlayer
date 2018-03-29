@@ -4,5 +4,24 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        android:text="@string/player_error"
+        android:id="@+id/player_error_msg"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/player_error_msg"
+        android:layout_marginTop="5dp"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:text="@string/player_retry"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:id="@+id/player_retry"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/retry_bg"/>
 </merge>

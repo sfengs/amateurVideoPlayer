@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/videoplayer_cover"
+        android:layout_centerHorizontal="true"
+        android:scaleType="centerCrop"/>
+
+    <c.seven.amateurvideoplayer.view.PlayerCenterView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/videoplayer_center"
+        android:layout_centerInParent="true"/>
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -58,11 +72,6 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <c.seven.amateurvideoplayer.view.PlayerCenterView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/videoplayer_center"
-        android:layout_centerVertical="true"/>
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:background="#B3000000"
+        android:layout_centerInParent="true"
+        android:padding="10dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/player_volume_icon"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/amateur_volume"/>
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="3dp"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:id="@+id/player_volume_progress"
+            android:layout_marginLeft="10dp"
+            android:progressDrawable="@drawable/seek_progress"
+            android:max="100"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+</merge>

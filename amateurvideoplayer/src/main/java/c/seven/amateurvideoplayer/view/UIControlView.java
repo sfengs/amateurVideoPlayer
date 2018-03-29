@@ -3,6 +3,8 @@ package c.seven.amateurvideoplayer.view;
 import android.content.Context;
 import android.support.v4.util.ArrayMap;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import c.seven.amateurvideoplayer.control.FullScreenUIControl;

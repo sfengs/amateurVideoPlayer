@@ -2,10 +2,12 @@ package c.seven.amateurvideoplayer.control;
 
 import android.content.Context;
 import android.support.annotation.IdRes;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import c.seven.amateurvideoplayer.R;
+import c.seven.amateurvideoplayer.view.AmateurVideoPlayer;
 import c.seven.amateurvideoplayer.view.PlayerCenterView;
 import c.seven.amateurvideoplayer.view.UIControlView;
 /**
@@ -14,9 +16,11 @@ import c.seven.amateurvideoplayer.view.UIControlView;
 
 public abstract class UIControl {
     private View contentView;
+    private ViewGroup root;
     Context mContext;
     public UIControl(Context context, ViewGroup root) {
         mContext = context;
+        this.root = root;
         contentView = View.inflate(context,getLayoutId(),root);
     }
 
@@ -31,8 +35,8 @@ public abstract class UIControl {
     }
 
     UIControlView getParentView() {
-        if (contentView != null) {
-            return (UIControlView) contentView.getParent();
+        if (root instanceof UIControlView) {
+            return (UIControlView) root;
         }
         return null;
     }
@@ -49,4 +53,12 @@ public abstract class UIControl {
     abstract void hideView();
 
     abstract void setProgressAndTime(long position);
+
+    public abstract void showError(View.OnClickListener retryClick);
+
+    public abstract void showVolume(int value);
+
+    public abstract void showBrightness(int value);
+
+    public abstract void showPosition(long position,long duration);
 }

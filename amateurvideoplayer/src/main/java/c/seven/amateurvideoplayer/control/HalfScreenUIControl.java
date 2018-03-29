@@ -73,6 +73,26 @@ public class HalfScreenUIControl extends UIControl implements View.OnClickListen
     }
 
     @Override
+    public void showError(View.OnClickListener retryClick) {
+        centerView.showErrorView(retryClick);
+    }
+
+    @Override
+    public void showVolume(int value) {
+        centerView.showVolume(value);
+    }
+
+    @Override
+    public void showBrightness(int value) {
+        centerView.showBrightness(value);
+    }
+
+    @Override
+    public void showPosition(long position, long duration) {
+        centerView.showPosition(position,duration);
+    }
+
+    @Override
     public void onClick(View v) {
         if (v == back) {
             if (getParentView() != null) {
