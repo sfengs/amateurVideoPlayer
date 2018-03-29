@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <c.seven.amateurvideoplayer.view.VideoPlayer
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/view_videoplayer"
+        android:layout_centerInParent="true"/>
+    <c.seven.amateurvideoplayer.view.GestureView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/view_gestureview"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"/>
+    <c.seven.amateurvideoplayer.view.UIControlView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/view_uicontrol"/>
+</RelativeLayout>
