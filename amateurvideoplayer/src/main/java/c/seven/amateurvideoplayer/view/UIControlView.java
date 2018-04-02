@@ -54,6 +54,8 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
 
     private UIControlListener uiControlListener;
 
+    private int halfVisibility;
+
     private MediaStateListener mediaStateListener = new MediaStateListener() {
         @Override
         public void prepareState() {
@@ -144,6 +146,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         share.setOnClickListener(this);
         play.setOnClickListener(this);
         playNext.setOnClickListener(this);
+        fullBtn.setOnClickListener(this);
     }
 
     public void setUiControlListener(UIControlListener uiControlListener) {
@@ -159,6 +162,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
     }
 
     public void setScreenModel(ScreenModel screenModel) {
+        systemUIUpdate(screenModel);
         if (currentScreen == screenModel) {
             return;
         }
@@ -166,6 +170,16 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         updateUIByScreenChang();
     }
 
+
+    private void systemUIUpdate(ScreenModel screenModel) {
+        if (screenModel == ScreenModel.FULL) {
+            halfVisibility = this.getSystemUiVisibility();
+            setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        } else if (screenModel == ScreenModel.HALF){
+            setSystemUiVisibility(halfVisibility);
+        }
+    }
 
     public MediaStateListener getMediaStateListener() {
         return mediaStateListener;
@@ -222,6 +236,10 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         } else if (v == playNext) {
             if (uiControlListener != null) {
                 uiControlListener.playNext();
+            }
+        } else if (v == fullBtn) {
+            if (uiControlListener != null) {
+                uiControlListener.changeScreen(ScreenModel.FULL);
             }
         }
     }
