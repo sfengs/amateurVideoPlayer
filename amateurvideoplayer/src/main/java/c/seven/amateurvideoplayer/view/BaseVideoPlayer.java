@@ -16,12 +16,15 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
         ,IMediaPlayer.OnCompletionListener,IMediaPlayer.OnErrorListener,IMediaPlayer.OnInfoListener
         ,IMediaPlayer.OnSeekCompleteListener,IMediaPlayer.OnVideoSizeChangedListener,SurfaceHolder.Callback{
 
+    private boolean isSurfaceDestroy = false;
     public BaseVideoPlayer(Context context) {
         super(context);
+        isSurfaceDestroy = false;
     }
 
     public BaseVideoPlayer(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        isSurfaceDestroy = false;
     }
 
     abstract void prepare();
@@ -44,6 +47,7 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
 
     abstract void onSeekComplete();
 
+    abstract void resetSurfaceHolder(SurfaceHolder holder);
 
     @Override
     public void onPrepared(IMediaPlayer iMediaPlayer) {
@@ -87,7 +91,12 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        prepare();
+        if (isSurfaceDestroy) {
+            isSurfaceDestroy = false;
+            resetSurfaceHolder(holder);
+        } else {
+            prepare();
+        }
     }
 
     @Override
@@ -98,7 +107,7 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         holder.getSurface().release();
-        holder.removeCallback(this);
-        release();
+        isSurfaceDestroy = true;
     }
+
 }

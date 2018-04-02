@@ -53,4 +53,9 @@ public class PlayerCenterView extends RelativeLayout {
         positionTxt.setText(AmateurUtils.stringFormatTime(position));
         durationTxt.setText(" / "+AmateurUtils.stringFormatTime(duration));
     }
+
+    public void showLoading() {
+        removeAllViews();
+        View.inflate(getContext(),R.layout.amateur_loading_layout,this);
+    }
 }

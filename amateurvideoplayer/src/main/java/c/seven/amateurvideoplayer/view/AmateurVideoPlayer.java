@@ -12,18 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import java.util.List;
+
 import c.seven.amateurvideoplayer.AmateurUtils;
 import c.seven.amateurvideoplayer.R;
 import c.seven.amateurvideoplayer.ScreenSensor;
 import c.seven.amateurvideoplayer.VideoBean;
 import c.seven.amateurvideoplayer.control.ScreenModel;
-import c.seven.amateurvideoplayer.control.UIControlViewCallback;
+import c.seven.amateurvideoplayer.control.UIControlListener;
 
 /**
  * Created by j-songsaihua-ol on 2018/3/28.
  */
 
-public class AmateurVideoPlayer extends FrameLayout implements UIControlViewCallback,ScreenSensor.ScreenChangeListener{
+public class AmateurVideoPlayer extends FrameLayout implements UIControlListener,
+        ScreenSensor.ScreenChangeListener{
     private Context mContext;
     private VideoPlayer mVideoPlayer;
     private GestureView mGestureView;
@@ -31,6 +34,8 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlViewCall
     private ScreenModel currentScreen = ScreenModel.HALF;
     private ScreenSensor screenSensor;
     private int halfWidth,halfheight;
+    private List<VideoBean> videos;
+    private int playIndex = 0;
     public AmateurVideoPlayer(@NonNull Context context) {
         super(context);
         initView(context);
@@ -51,31 +56,22 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlViewCall
         screenSensor.setCurrentScreen(currentScreen);
         screenSensor.setScreenChangeListener(this);
         uiControlView.setScreenModel(currentScreen);
+        uiControlView.setUiControlListener(this);
+        mVideoPlayer.setMediaStateListener(uiControlView.getMediaStateListener());
     }
 
     public void startPlayer(VideoBean videoBean) {
         if (videoBean != null) {
+            uiControlView.loadData(videoBean);
             mVideoPlayer.startVideo(videoBean);
         }
     }
 
-    @Override
-    public void screenChange(ScreenModel screenModel) {
-        int rotate = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-        if (screenModel == ScreenModel.FULL) {
-            rotate = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-        } else if (screenModel == ScreenModel.HALF) {
-            rotate = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+    public void startPlayer(List<VideoBean> list) {
+        if (list != null && list.size() > 0) {
+            videos = list;
+            startPlayer(list.get(0));
         }
-        if (screenSensor != null) {
-            screenSensor.setCurrentScreen(screenModel);
-        }
-        changeOrientation(screenModel,rotate);
-    }
-
-    @Override
-    public ScreenModel getCurrentScreen() {
-        return currentScreen;
     }
 
     public void onResume() {
@@ -141,13 +137,95 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlViewCall
 
     public boolean onBackPressed() {
         if (currentScreen == ScreenModel.FULL) {
-            screenChange(ScreenModel.HALF);
+            changeScreen(ScreenModel.HALF);
             return true;
         } else if (currentScreen == ScreenModel.HALF) {
-            if (AmateurUtils.isFinishing(mContext)) {
+            if (!AmateurUtils.isFinishing(mContext)) {
+                if (uiControlView != null) {
+                    uiControlView.cancelUpdateSeekBarTask();
+                }
+                if (mVideoPlayer != null) {
+                    mVideoPlayer.release();
+                }
                 AmateurUtils.finish(mContext);
             }
         }
         return false;
+    }
+    @Override
+    public long getCurrentPosition() {
+        if (mVideoPlayer != null) {
+            return mVideoPlayer.getCurrentPosition();
+        }
+        return 0;
+    }
+
+    @Override
+    public long getTotal() {
+        if (mVideoPlayer != null) {
+            return mVideoPlayer.getDuration();
+        }
+        return 0;
+    }
+
+    @Override
+    public void changeScreen(ScreenModel screenModel) {
+        int rotate = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+        if (screenModel == ScreenModel.FULL) {
+            rotate = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        } else if (screenModel == ScreenModel.HALF) {
+            rotate = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        }
+        if (screenSensor != null) {
+            screenSensor.setCurrentScreen(screenModel);
+        }
+        changeOrientation(screenModel,rotate);
+    }
+
+    @Override
+    public void retryPlay() {
+        if (mVideoPlayer != null) {
+            mVideoPlayer.retryPlay();
+        }
+    }
+
+    @Override
+    public void onBack() {
+        onBackPressed();
+    }
+
+    @Override
+    public boolean isHasNext() {
+        if (videos != null && videos.size() > 0 && playIndex < videos.size() -1) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void playNext() {
+        if (isHasNext()) {
+            playIndex++;
+//            startPlayer(videos.get(playIndex));
+        }
+    }
+
+    @Override
+    public void playClick() {
+        if (mVideoPlayer != null) {
+            if (mVideoPlayer.isPlaying()) {
+                mVideoPlayer.pause();
+            } else if (mVideoPlayer.isPause()) {
+                mVideoPlayer.start();
+            }
+        }
+    }
+
+    @Override
+    public int getPlayerState() {
+        if (mVideoPlayer != null) {
+            return mVideoPlayer.getCurrentState();
+        }
+        return -1;
     }
 }

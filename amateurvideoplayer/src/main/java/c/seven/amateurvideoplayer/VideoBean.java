@@ -11,7 +11,7 @@ public class VideoBean implements Serializable {
     private String playUrl;
     private String coverUrl;
     private String downloadUrl;
-    private String title;
+    private String title = "";
 
     public String getId() {
         return id;
