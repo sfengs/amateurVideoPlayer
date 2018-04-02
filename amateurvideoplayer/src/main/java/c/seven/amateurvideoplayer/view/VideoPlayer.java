@@ -150,7 +150,7 @@ public class VideoPlayer extends BaseVideoPlayer {
     }
 
     boolean isPlaying() {
-        return currentState == PLAYING_STATE;
+        return currentState == PLAYING_STATE || currentState == RANDER_STATE;
     }
 
     public boolean isPause() {

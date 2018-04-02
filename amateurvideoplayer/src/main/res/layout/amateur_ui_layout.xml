@@ -87,7 +87,8 @@
         android:layout_alignParentBottom="true"
         android:id="@+id/videoplayer_bottom"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="10dp">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

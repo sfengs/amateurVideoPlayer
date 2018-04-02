@@ -1,7 +1,6 @@
 package c.seven.amateurvideoplayer.view;
 
 import android.content.Context;
-import android.support.v4.util.ArrayMap;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -94,10 +93,12 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         @Override
         public void playingState() {
             updatePlayUI();
+            startDisMissUITask();
         }
 
         @Override
         public void pauseState() {
+            cancelDisMissUITask();
             showView();
             updatePlayUI();
         }
@@ -119,7 +120,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         initView(context);
     }
     private void initView(Context context) {
-        View.inflate(context, R.layout.amateur_full_layout,this);
+        View.inflate(context, R.layout.amateur_ui_layout,this);
         cover = findViewById(R.id.videoplayer_cover);
         back = findViewById(R.id.videoplayer_back);
         share = findViewById(R.id.videoplayer_share);
@@ -311,8 +312,20 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
             if (state == VideoPlayer.PAUSE_STATE) {
                 play.setImageResource(R.drawable.amateur_pause);
             } else {
-                play.setImageResource(R.drawable.amateur_pause);
+                play.setImageResource(R.drawable.amateur_play);
             }
+        }
+    }
+
+    public void singleTap() {
+        cancelDisMissUITask();
+        if (bottomLayout.getVisibility() != VISIBLE) {
+            showView();
+            if (uiControlListener.getPlayerState() != VideoPlayer.PAUSE_STATE) {
+                startDisMissUITask();
+            }
+        } else {
+            hideView();
         }
     }
 }

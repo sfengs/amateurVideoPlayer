@@ -18,6 +18,7 @@ import c.seven.amateurvideoplayer.AmateurUtils;
 import c.seven.amateurvideoplayer.R;
 import c.seven.amateurvideoplayer.ScreenSensor;
 import c.seven.amateurvideoplayer.VideoBean;
+import c.seven.amateurvideoplayer.control.GestureListener;
 import c.seven.amateurvideoplayer.control.ScreenModel;
 import c.seven.amateurvideoplayer.control.UIControlListener;
 
@@ -26,7 +27,7 @@ import c.seven.amateurvideoplayer.control.UIControlListener;
  */
 
 public class AmateurVideoPlayer extends FrameLayout implements UIControlListener,
-        ScreenSensor.ScreenChangeListener{
+        ScreenSensor.ScreenChangeListener,GestureListener{
     private Context mContext;
     private VideoPlayer mVideoPlayer;
     private GestureView mGestureView;
@@ -58,6 +59,7 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
         uiControlView.setScreenModel(currentScreen);
         uiControlView.setUiControlListener(this);
         mVideoPlayer.setMediaStateListener(uiControlView.getMediaStateListener());
+        mGestureView.setGestureListener(this);
     }
 
     public void startPlayer(VideoBean videoBean) {
@@ -227,5 +229,47 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
             return mVideoPlayer.getCurrentState();
         }
         return -1;
+    }
+
+    @Override
+    public void showPosition(long position) {
+
+    }
+
+    @Override
+    public void showVolume(int value) {
+
+    }
+
+    @Override
+    public void showBrightness(int value) {
+
+    }
+
+    @Override
+    public void onSingleTap() {
+        if (mVideoPlayer != null && uiControlView != null) {
+            if (mVideoPlayer.isPause() || mVideoPlayer.isPlaying()) {
+                uiControlView.singleTap();
+            }
+        }
+    }
+
+    @Override
+    public void onDoubleTap() {
+
+    }
+
+    @Override
+    public long getDuration() {
+        if (mVideoPlayer != null) {
+            return mVideoPlayer.getDuration();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getCurrentVolume() {
+        return 0;
     }
 }
