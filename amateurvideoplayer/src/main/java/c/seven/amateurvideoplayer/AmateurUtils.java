@@ -2,6 +2,10 @@ package c.seven.amateurvideoplayer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.format.DateFormat;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by j-songsaihua-ol on 2018/3/23.
@@ -39,4 +43,19 @@ public class AmateurUtils {
             ((Activity) context).finish();
         }
     }
+
+    public static String formatCurrentTime(Context context,long time) {
+        if (time > 0) {
+            boolean is24Hour = DateFormat.is24HourFormat(context);
+            String pattern = "hh:mm";//12小时制
+            if (is24Hour) {
+                pattern = "HH:mm";//24小时制
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            Date date = new Date(time);
+            return simpleDateFormat.format(date);
+        }
+        return "";
+    }
+
 }

@@ -1,7 +1,12 @@
 package c.seven.amateurvideoplayer.view;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,6 +34,7 @@ import c.seven.amateurvideoplayer.control.UIControlListener;
  */
 
 public class UIControlView extends RelativeLayout implements View.OnClickListener{
+    private Context mContext;
     private static Timer sUpdateSeekBarTimer;
     private UpdateSeekBarTask updateSeekBarTimerTask;
     private static final long UPDATE_SEEK_PERIOD = 300;
@@ -40,7 +46,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
     private PlayerCenterView centerView;
     private LinearLayout batteryLayout;
     private ImageView batteryImg;
-    private TextView batteryTxt;
+    private TextView batteryTxt,currentTime;
     private ImageView play,playNext,fullBtn;
     private TextView startTime,endTime;
     private SeekBar seekBar;
@@ -55,6 +61,8 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
     private UIControlListener uiControlListener;
 
     private int halfVisibility;
+
+    private BatteryReceiver batteryReceiver;
 
     private MediaStateListener mediaStateListener = new MediaStateListener() {
         @Override
@@ -122,6 +130,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         initView(context);
     }
     private void initView(Context context) {
+        mContext = context;
         View.inflate(context, R.layout.amateur_ui_layout,this);
         cover = findViewById(R.id.videoplayer_cover);
         back = findViewById(R.id.videoplayer_back);
@@ -131,6 +140,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         batteryLayout = findViewById(R.id.videoplayer_battery_layout);
         batteryImg = findViewById(R.id.videoplayer_battery_img);
         batteryTxt = findViewById(R.id.videoplayer_battery_txt);
+        currentTime = findViewById(R.id.videoplayer_time);
         play = findViewById(R.id.videoplayer_bottom_play);
         playNext = findViewById(R.id.videoplayer_next);
         fullBtn = findViewById(R.id.videoplayer_fullbtn);
@@ -281,6 +291,34 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         }
     }
 
+
+    private class BatteryReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AmateurUtils.isFinishing(mContext) || isViewDestroy) {
+                return;
+            }
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+            int batteryPct = (int) ((level / (float)scale) * 100);
+            updateBatteryAndTime(batteryPct);
+        }
+    }
+
+    private void registBattery() {
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryReceiver = new BatteryReceiver();
+        mContext.registerReceiver(batteryReceiver,intentFilter);
+
+    }
+
+    private void unregistBattery() {
+        if (batteryReceiver != null) {
+            mContext.unregisterReceiver(batteryReceiver);
+        }
+    }
     private void updateSeekBarAndTime(long currentPosition,long duration) {
         if (duration <= 0) {
             return;
@@ -317,10 +355,17 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        registBattery();
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         isViewDestroy = true;
         cancelUpdateSeekBarTask();
         cancelDisMissUITask();
+        unregistBattery();
         super.onDetachedFromWindow();
     }
 
@@ -333,6 +378,24 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
                 play.setImageResource(R.drawable.amateur_play);
             }
         }
+    }
+
+    private void updateBatteryAndTime(int batteryPct) {
+        if (batteryPct <= 10) {
+            batteryImg.setImageResource(R.drawable.amateur_battery_level_10);
+        } else if (batteryPct > 10 && batteryPct <= 30) {
+            batteryImg.setImageResource(R.drawable.amateur_battery_level_30);
+        } else if (batteryPct > 30 && batteryPct <= 50) {
+            batteryImg.setImageResource(R.drawable.amateur_battery_level_50);
+        } else if (batteryPct > 50 && batteryPct <= 70) {
+            batteryImg.setImageResource(R.drawable.amateur_battery_level_70);
+        } else if (batteryPct > 70 && batteryPct <= 90) {
+            batteryImg.setImageResource(R.drawable.amateur_battery_level_90);
+        } else if (batteryPct > 90 && batteryPct <= 100) {
+            batteryImg.setImageResource(R.drawable.amateur_battery_level_100);
+        }
+        batteryTxt.setText(batteryPct+"%");
+        currentTime.setText(AmateurUtils.formatCurrentTime(mContext,System.currentTimeMillis()));
     }
 
     public void singleTap() {

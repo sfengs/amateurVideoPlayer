@@ -59,14 +59,18 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:id="@+id/videoplayer_battery_layout"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_toLeftOf="@id/videoplayer_location"
             android:layout_centerVertical="true">
-            <ImageView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
                 android:src="@drawable/amateur_battery_level_10"
                 android:id="@+id/videoplayer_battery_img"/>
             <TextView
@@ -76,7 +80,15 @@
                 android:textSize="8sp"
                 android:text=""
                 android:layout_gravity="center_horizontal"
-                android:id="@+id/videoplayer_battery_txt"/>
+                android:id="@+id/videoplayer_time"/>
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/videoplayer_battery_txt"
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                />
         </LinearLayout>
     </RelativeLayout>
 
