@@ -64,6 +64,8 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
 
     private BatteryReceiver batteryReceiver;
 
+    private static int sBatteryPct = 50;
+
     private MediaStateListener mediaStateListener = new MediaStateListener() {
         @Override
         public void prepareState() {
@@ -303,13 +305,17 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
             int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
             int batteryPct = (int) ((level / (float)scale) * 100);
-            updateBatteryAndTime(batteryPct);
+            sBatteryPct = batteryPct;
+            updateBatteryAndTime();
+            unregistBattery();
         }
     }
 
     private void registBattery() {
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        batteryReceiver = new BatteryReceiver();
+        if (batteryReceiver == null) {
+            batteryReceiver = new BatteryReceiver();
+        }
         mContext.registerReceiver(batteryReceiver,intentFilter);
 
     }
@@ -352,12 +358,12 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
     private void showView() {
         topLayout.setVisibility(VISIBLE);
         bottomLayout.setVisibility(VISIBLE);
+        registBattery();
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        registBattery();
     }
 
     @Override
@@ -365,7 +371,6 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         isViewDestroy = true;
         cancelUpdateSeekBarTask();
         cancelDisMissUITask();
-        unregistBattery();
         super.onDetachedFromWindow();
     }
 
@@ -380,21 +385,22 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         }
     }
 
-    private void updateBatteryAndTime(int batteryPct) {
-        if (batteryPct <= 10) {
+    private void updateBatteryAndTime() {
+        int pct = sBatteryPct;
+        if (pct <= 10) {
             batteryImg.setImageResource(R.drawable.amateur_battery_level_10);
-        } else if (batteryPct > 10 && batteryPct <= 30) {
+        } else if (pct > 10 && pct <= 30) {
             batteryImg.setImageResource(R.drawable.amateur_battery_level_30);
-        } else if (batteryPct > 30 && batteryPct <= 50) {
+        } else if (pct > 30 && pct <= 50) {
             batteryImg.setImageResource(R.drawable.amateur_battery_level_50);
-        } else if (batteryPct > 50 && batteryPct <= 70) {
+        } else if (pct > 50 && pct <= 70) {
             batteryImg.setImageResource(R.drawable.amateur_battery_level_70);
-        } else if (batteryPct > 70 && batteryPct <= 90) {
+        } else if (pct > 70 && pct <= 90) {
             batteryImg.setImageResource(R.drawable.amateur_battery_level_90);
-        } else if (batteryPct > 90 && batteryPct <= 100) {
+        } else if (pct > 90 && pct <= 100) {
             batteryImg.setImageResource(R.drawable.amateur_battery_level_100);
         }
-        batteryTxt.setText(batteryPct+"%");
+        batteryTxt.setText(pct+"%");
         currentTime.setText(AmateurUtils.formatCurrentTime(mContext,System.currentTimeMillis()));
     }
 
