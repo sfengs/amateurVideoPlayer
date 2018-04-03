@@ -73,6 +73,13 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         public void prepareState() {
             hideView();
             centerView.showLoading();
+            if (uiControlListener != null) {
+                if (uiControlListener.isHasNext()) {
+                    playNext.setEnabled(true);
+                } else {
+                    playNext.setEnabled(false);
+                }
+            }
         }
 
         @Override

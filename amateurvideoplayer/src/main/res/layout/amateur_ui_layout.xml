@@ -111,7 +111,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/videoplayer_next"
-            android:src="@drawable/amateur_next"
+            android:src="@drawable/player_next_bg"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/videoplayer_bottom_play"
             android:layout_marginLeft="5dp"/>
