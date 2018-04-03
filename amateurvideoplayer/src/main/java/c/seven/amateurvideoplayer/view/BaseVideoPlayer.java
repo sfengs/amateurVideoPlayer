@@ -3,9 +3,11 @@ package c.seven.amateurvideoplayer.view;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.widget.RelativeLayout;
 
+import c.seven.amateurvideoplayer.PlayerConfig;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
@@ -17,6 +19,7 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
         ,IMediaPlayer.OnSeekCompleteListener,IMediaPlayer.OnVideoSizeChangedListener,SurfaceHolder.Callback{
 
     private boolean isSurfaceDestroy = false;
+    private static final String TAG = "BaseVideoPlayer";
     public BaseVideoPlayer(Context context) {
         super(context);
         isSurfaceDestroy = false;
@@ -91,6 +94,9 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        if (PlayerConfig.isPrintLog) {
+            Log.i(TAG,"surfaceCreated");
+        }
         if (isSurfaceDestroy) {
             isSurfaceDestroy = false;
             resetSurfaceHolder(holder);
@@ -106,6 +112,9 @@ public abstract class BaseVideoPlayer extends RelativeLayout implements IMediaPl
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        if (PlayerConfig.isPrintLog) {
+            Log.i(TAG,"surfaceDestroyed");
+        }
         holder.getSurface().release();
         isSurfaceDestroy = true;
     }

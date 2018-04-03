@@ -212,7 +212,8 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
     public void playNext() {
         if (isHasNext()) {
             playIndex++;
-//            startPlayer(videos.get(playIndex));
+            mVideoPlayer.release();
+            startPlayer(videos.get(playIndex));
         }
     }
 

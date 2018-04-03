@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.ViewGroup;
 
@@ -60,11 +61,6 @@ public class VideoPlayer extends BaseVideoPlayer {
     }
 
     private void initPlayer() {
-        if (PlayerConfig.isUseIjkPlayer) {
-            iMediaPlayer = new IjkMediaPlayer();
-        } else {
-            iMediaPlayer = new AndroidMediaPlayer();
-        }
         playerSurfaceView = new PlayerSurfaceView(getContext());
         playerSurfaceView.getHolder().addCallback(this);
         LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -86,6 +82,7 @@ public class VideoPlayer extends BaseVideoPlayer {
 
     public void retryPlay() {
         if (currentVideo != null) {
+            releaseSurface();
             initPlayer();
         }
     }
@@ -93,8 +90,13 @@ public class VideoPlayer extends BaseVideoPlayer {
     @Override
     void prepare() {
         try {
-            currentState = PREPARE_STATE;
-            setState(currentState);
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    currentState = PREPARE_STATE;
+                    setState(currentState);
+                }
+            });
             Message message = Message.obtain();
             message.what = PREPARE_PLAYER;
             videoPlayerHandler.sendMessage(message);
@@ -105,6 +107,14 @@ public class VideoPlayer extends BaseVideoPlayer {
 
     private void initPayerSetting(){
         try {
+            if (PlayerConfig.isPrintLog) {
+                Log.i(TAG,"initPayerSetting : url : "+currentVideo.getPlayUrl());
+            }
+            if (PlayerConfig.isUseIjkPlayer) {
+                iMediaPlayer = new IjkMediaPlayer();
+            } else {
+                iMediaPlayer = new AndroidMediaPlayer();
+            }
             iMediaPlayer.setOnPreparedListener(this);
             iMediaPlayer.setOnVideoSizeChangedListener(this);
             iMediaPlayer.setOnBufferingUpdateListener(this);
@@ -124,30 +134,50 @@ public class VideoPlayer extends BaseVideoPlayer {
 
     @Override
     void prepared() {
-        currentState = PREPARED_STATE;
-        setState(currentState);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                currentState = PREPARED_STATE;
+                setState(currentState);
+            }
+        });
         iMediaPlayer.start();
     }
 
     @Override
     void render() {
-        currentState = RANDER_STATE;
-        setState(currentState);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                currentState = RANDER_STATE;
+                setState(currentState);
+            }
+        });
     }
 
     void start() {
         if (isPause()) {
             iMediaPlayer.start();
-            currentState = PLAYING_STATE;
-            setState(currentState);
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    currentState = PLAYING_STATE;
+                    setState(currentState);
+                }
+            });
         }
     }
 
     void pause() {
         if (isPlaying()) {
             iMediaPlayer.pause();
-            currentState = PAUSE_STATE;
-            setState(currentState);
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    currentState = PAUSE_STATE;
+                    setState(currentState);
+                }
+            });
         }
     }
 
@@ -165,9 +195,10 @@ public class VideoPlayer extends BaseVideoPlayer {
         Message message = Message.obtain();
         message.what = RELASE_PLAYER;
         videoPlayerHandler.sendMessage(message);
+        releaseSurface();
     }
 
-    private void handleRelasePlayer() {
+    private void releaseSurface() {
         if (playerSurfaceView != null) {
             SurfaceHolder holder = playerSurfaceView.getHolder();
             if (holder != null) {
@@ -176,7 +207,11 @@ public class VideoPlayer extends BaseVideoPlayer {
                 }
                 holder.removeCallback(this);
             }
+            removeView(playerSurfaceView);
         }
+    }
+
+    private void handleRelasePlayer() {
         if (iMediaPlayer != null) {
             final IMediaPlayer player = iMediaPlayer;
             if (player.isPlaying()) {
@@ -206,7 +241,12 @@ public class VideoPlayer extends BaseVideoPlayer {
     @Override
     void onVideoSize() {
         if (playerSurfaceView != null && iMediaPlayer != null) {
-            playerSurfaceView.setVideoSize(iMediaPlayer.getVideoWidth(),iMediaPlayer.getVideoHeight());
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    playerSurfaceView.setVideoSize(iMediaPlayer.getVideoWidth(),iMediaPlayer.getVideoHeight());
+                }
+            });
         }
     }
 
@@ -217,15 +257,28 @@ public class VideoPlayer extends BaseVideoPlayer {
 
     @Override
     void onCompletion() {
-        currentState = COMPLETE_STATE;
-        setState(currentState);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                currentState = COMPLETE_STATE;
+                setState(currentState);
+            }
+        });
     }
 
     @Override
     void onError(int what, int extra) {
         if (what != 38 && extra != -38 && what != -38 && extra != 38 && extra != -19) {
-            currentState = ERROR_STATE;
-            setState(currentState);
+            if (PlayerConfig.isPrintLog) {
+                Log.i(TAG,"what : "+what+", extra : "+extra);
+            }
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    currentState = ERROR_STATE;
+                    setState(currentState);
+                }
+            });
             Message message = Message.obtain();
             message.what = RELASE_PLAYER;
             videoPlayerHandler.sendMessage(message);

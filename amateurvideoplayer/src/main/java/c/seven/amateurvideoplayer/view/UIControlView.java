@@ -84,7 +84,8 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         @Override
         public void errorState() {
             cancelUpdateSeekBarTask();
-            hideView();
+            cancelDisMissUITask();
+            showErrorUI();
             centerView.showErrorView(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -93,6 +94,9 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
                     }
                 }
             });
+            if (uiControlListener != null && currentScreen == ScreenModel.FULL) {
+                uiControlListener.changeScreen(ScreenModel.HALF);
+            }
         }
 
         @Override
@@ -386,6 +390,15 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         topLayout.setVisibility(VISIBLE);
         bottomLayout.setVisibility(VISIBLE);
         registBattery();
+    }
+
+    private void showErrorUI() {
+        topLayout.setVisibility(VISIBLE);
+        back.setVisibility(VISIBLE);
+        title.setVisibility(GONE);
+        share.setVisibility(GONE);
+        batteryLayout.setVisibility(GONE);
+        bottomLayout.setVisibility(GONE);
     }
 
     @Override

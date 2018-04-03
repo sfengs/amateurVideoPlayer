@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
     android:id="@+id/player_error_layout">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
+        android:padding="10dp">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,4 +32,5 @@
         android:id="@+id/player_retry"
         android:layout_centerHorizontal="true"
         android:background="@drawable/retry_bg"/>
+    </LinearLayout>
 </RelativeLayout>
