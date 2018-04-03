@@ -63,5 +63,10 @@ AndroidManifest:
 android:configChanges="orientation|screenSize|keyboardHidden"
 android:screenOrientation="portrait"
 ```
+联系：
+---
+```
+QQ：178285852
+```
 
 
