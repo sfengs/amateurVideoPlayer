@@ -6,7 +6,7 @@ android videoplayer mediaplayer 业余时间写的Android播放器，支持全�
 xml:高度固定
 --
 ```
-<c.seven.amateurvideoplayer.view.AmateurVideoPlayer<br>
+<c.seven.amateurvideoplayer.view.AmateurVideoPlayer
 android:layout_width="match_parent"
 android:layout_height="200dp"
 android:id="@+id/videoplayer"
