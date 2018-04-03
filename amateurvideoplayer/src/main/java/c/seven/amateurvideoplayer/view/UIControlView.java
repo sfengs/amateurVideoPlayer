@@ -33,7 +33,7 @@ import c.seven.amateurvideoplayer.control.UIControlListener;
  * Created by j-songsaihua-ol on 2018/3/28.
  */
 
-public class UIControlView extends RelativeLayout implements View.OnClickListener{
+public class UIControlView extends RelativeLayout implements View.OnClickListener,SeekBar.OnSeekBarChangeListener{
     private Context mContext;
     private static Timer sUpdateSeekBarTimer;
     private UpdateSeekBarTask updateSeekBarTimerTask;
@@ -65,6 +65,8 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
     private BatteryReceiver batteryReceiver;
 
     private static int sBatteryPct = 50;
+
+    private boolean isSeekBarTouch = false;
 
     private MediaStateListener mediaStateListener = new MediaStateListener() {
         @Override
@@ -159,6 +161,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         play.setOnClickListener(this);
         playNext.setOnClickListener(this);
         fullBtn.setOnClickListener(this);
+        seekBar.setOnSeekBarChangeListener(this);
     }
 
     public void setUiControlListener(UIControlListener uiControlListener) {
@@ -254,6 +257,30 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
                 uiControlListener.changeScreen(ScreenModel.FULL);
             }
         }
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (isSeekBarTouch) {
+            long position = progress * uiControlListener.getTotal()/100;
+            showPosition(position,uiControlListener.getTotal());
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        cancelDisMissUITask();
+        isSeekBarTouch = true;
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        isSeekBarTouch = false;
+        startDisMissUITask();
+        long seekTo = seekBar.getProgress() * uiControlListener.getTotal()/100;
+        uiControlListener.seekBarChange(seekTo);
+        centerView.hideCenter();
+
     }
 
     private class UpdateSeekBarTask extends TimerTask{
@@ -429,5 +456,6 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
 
     public void showPosition(long position,long total) {
         centerView.showPosition(position,total);
+        updateSeekBarAndTime(position,total);
     }
 }

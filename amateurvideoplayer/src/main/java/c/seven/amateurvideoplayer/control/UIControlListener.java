@@ -14,4 +14,5 @@ public interface UIControlListener {
     void playNext();
     void playClick();
     int getPlayerState();
+    void seekBarChange(long position);
 }

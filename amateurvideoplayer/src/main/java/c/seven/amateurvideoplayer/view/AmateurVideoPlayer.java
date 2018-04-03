@@ -236,6 +236,11 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
     }
 
     @Override
+    public void seekBarChange(long position) {
+        mVideoPlayer.seekTo(position);
+    }
+
+    @Override
     public void showPosition(long position) {
         uiControlView.showPosition(position,mVideoPlayer.getDuration());
     }
