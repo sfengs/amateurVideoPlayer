@@ -6,4 +6,6 @@ package c.seven.amateurvideoplayer;
 
 public class PlayerConfig {
     public static final boolean isUseIjkPlayer = true;
+
+    public static final boolean isPrintLog = true;
 }

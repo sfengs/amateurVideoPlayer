@@ -1,6 +1,7 @@
 package c.seven.amateurvideoplayer.view;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -113,6 +114,7 @@ public class VideoPlayer extends BaseVideoPlayer {
             iMediaPlayer.setOnCompletionListener(this);
             iMediaPlayer.setScreenOnWhilePlaying(true);
             iMediaPlayer.setDataSource(currentVideo.getPlayUrl());
+            iMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             iMediaPlayer.setDisplay(playerSurfaceView.getHolder());
             iMediaPlayer.prepareAsync();
         } catch (IOException e) {

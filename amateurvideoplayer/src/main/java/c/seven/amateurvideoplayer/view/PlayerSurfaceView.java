@@ -6,11 +6,14 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 
+import c.seven.amateurvideoplayer.PlayerConfig;
+
 /**
  * Created by j-songsaihua-ol on 2018/3/23.
  */
 
 public class PlayerSurfaceView extends SurfaceView {
+    private static final String TAG = "PlayerSurfaceView";
     private int mVideoWidth = 0;
     private int mVideoHeight = 0;
     public PlayerSurfaceView(Context context) {
@@ -36,7 +39,9 @@ public class PlayerSurfaceView extends SurfaceView {
         int parentHeight = ((View) getParent()).getMeasuredHeight();
         int parentWidth = ((View) getParent()).getMeasuredWidth();
         if (mVideoWidth > 0 && mVideoHeight > 0 && parentHeight > 0 && parentWidth > 0) {
-            Log.i("print","mVideoWidth : "+mVideoWidth+", mVideoHeight : "+mVideoHeight);
+            if (PlayerConfig.isPrintLog) {
+                Log.i(TAG,"mVideoWidth : "+mVideoWidth+", mVideoHeight : "+mVideoHeight);
+            }
             float videoRate = (float)mVideoWidth/(float)mVideoHeight;
             float parentRate = (float)parentWidth/(float)parentHeight;
             if (videoRate < 1) {
@@ -107,7 +112,9 @@ public class PlayerSurfaceView extends SurfaceView {
                     videoWidth = mVideoWidth;
                 }
             }
-            Log.i("print","videoHeight : "+videoHeight+", videoWidth : "+videoWidth);
+            if (PlayerConfig.isPrintLog) {
+                Log.i(TAG,"videoHeight : "+videoHeight+", videoWidth : "+videoWidth);
+            }
         }
         setMeasuredDimension(videoWidth,videoHeight);
     }

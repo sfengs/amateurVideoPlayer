@@ -21,4 +21,10 @@ public interface GestureListener {
     long getDuration();
 
     int getCurrentVolume();
+
+    void gestureUp();
+
+    boolean gestureEnable();
+
+    void gestureSeekTo(long position);
 }

@@ -115,7 +115,7 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
 
         @Override
         public void renderState() {
-            centerView.removeAllViews();
+            hideCenter();
             showView();
             startDisMissUITask();
         }
@@ -398,6 +398,10 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         currentTime.setText(AmateurUtils.formatCurrentTime(mContext,System.currentTimeMillis()));
     }
 
+    public void hideCenter() {
+        centerView.hideCenter();
+    }
+
     public void singleTap() {
         cancelDisMissUITask();
         if (bottomLayout.getVisibility() != VISIBLE) {
@@ -408,5 +412,16 @@ public class UIControlView extends RelativeLayout implements View.OnClickListene
         } else {
             hideView();
         }
+    }
+    public void showVolume(int v) {
+        centerView.showVolume(v);
+    }
+
+    public void showBrightness(int v) {
+        centerView.showBrightness(v);
+    }
+
+    public void showPosition(long position,long total) {
+        centerView.showPosition(position,total);
     }
 }

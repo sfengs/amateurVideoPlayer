@@ -6,6 +6,7 @@ import android.media.AudioManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.view.ViewConfiguration;
 import android.view.Window;
 import android.view.WindowManager;
 
+import c.seven.amateurvideoplayer.PlayerConfig;
 import c.seven.amateurvideoplayer.control.GestureListener;
 
 /**
@@ -20,6 +22,7 @@ import c.seven.amateurvideoplayer.control.GestureListener;
  */
 
 public class GestureView extends View implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener{
+    private static final String TAG = "GestureView";
     private GestureDetector gestureDetector;
     private Context mContext;
     private GestureListener gestureListener;
@@ -27,6 +30,7 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
     private boolean isVolume = false;
     private boolean isBrightness = false;
     private AudioManager audioManager;
+    private long currentPosition;
     public GestureView(Context context) {
         super(context);
         init(context);
@@ -54,9 +58,20 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
         }
         if (event.getAction() == MotionEvent.ACTION_UP ||
                 event.getAction() == MotionEvent.ACTION_CANCEL) {
+            if (isPosition) {
+                gestureListener.gestureSeekTo(currentPosition);
+            }
             isPosition = false;
             isVolume = false;
             isBrightness = false;
+            if (gestureListener != null) {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        gestureListener.gestureUp();
+                    }
+                },500);
+            }
         }
         return super.onTouchEvent(event);
     }
@@ -87,7 +102,11 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
     @Override
     public boolean onDown(MotionEvent e) {
         //手指按下
-        return true;
+        if (gestureListener != null) {
+            currentPosition = gestureListener.getCurrentPosition();
+            return gestureListener.gestureEnable();
+        }
+        return false;
     }
 
     @Override
@@ -105,6 +124,9 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
         if (e2.getEventTime() - e1.getDownTime() < ViewConfiguration.getTapTimeout()) {
             return false;
         }
+        if (!gestureListener.gestureEnable()) {
+            return false;
+        }
         float absDisX = Math.abs(distanceX);
         float absDisY = Math.abs(distanceY);
         int viewWidth = getWidth();
@@ -112,18 +134,25 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
         float disRateX = Math.abs(e2.getX()/viewWidth - e1.getX()/viewWidth);
         float disRateY = Math.abs(e2.getY()/viewHeight - e1.getY()/viewHeight);
         if (absDisX > absDisY && disRateX > 0.1 && !isBrightness && !isVolume) {
-            changePosition(distanceX/viewWidth);
+            float progress = -distanceX/4;
+            if (Math.abs(progress) > 5) {
+                progress = Math.abs(progress)/progress * 5;
+            }
+            changePosition(progress);
         } else if (absDisY > absDisX && disRateY > 0.1) {
             //调整音量和亮度，x位置在两侧
             float rateX1 = e1.getX()/viewWidth;
             float rateX2 = e2.getX()/viewWidth;
-            double percentY = distanceY/viewHeight;
+            float progress = distanceY/2;
+            if (Math.abs(progress) > 5) {
+                progress = progress > 0 ? 5 : -5;
+            }
             if (rateX1 > 0 && rateX1 < 0.4 && rateX2 > 0 && rateX2 < 0.4 && !isPosition && !isVolume) {
                 //左侧 调整亮度
-                changeBrightness(percentY);
-            } else if (rateX1 > 0.6 && rateX1 < 1 && rateX2 > 0.6 && rateX2 < 1 && !isPosition && isBrightness) {
+                changeBrightness(progress);
+            } else if (rateX1 > 0.6 && rateX1 < 1 && rateX2 > 0.6 && rateX2 < 1 && !isPosition && !isBrightness) {
                 //右侧。调整声音
-                changeVolume(percentY);
+                changeVolume(progress);
             }
         }
         return true;
@@ -139,24 +168,28 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
         return false;
     }
 
-    private void changePosition(double percent) {
+    private void changePosition(float progress) {
         if (gestureListener != null) {
             isPosition = true;
-            long position = (long) (gestureListener.getCurrentPosition() + percent * gestureListener.getDuration());
+            long position = (long) (currentPosition + progress * 1000);
             if (position > gestureListener.getDuration()) {
                 position = gestureListener.getDuration();
             } else if (position < 0) {
                 position = 0;
             }
+            currentPosition = position;
             gestureListener.showPosition(position);
         }
     }
 
-    private void changeVolume(double percent) {
+    private void changeVolume(float progress) {
         if (gestureListener != null) {
             isVolume = true;
             int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            int currentVolume = (int) (gestureListener.getCurrentVolume() + percent * maxVolume);
+            int currentVolume = (int) ((gestureListener.getCurrentVolume() + progress));
+            if (PlayerConfig.isPrintLog) {
+                Log.i(TAG,"maxVolume : "+maxVolume+", currentVolume : "+currentVolume+", percent : "+progress);
+            }
             if (currentVolume > maxVolume) {
                 currentVolume = maxVolume;
             } else if (currentVolume < 0) {
@@ -169,7 +202,7 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
 
     }
 
-    private void changeBrightness(double percent) {
+    private void changeBrightness(float progress) {
         if (gestureListener != null) {
             isBrightness = true;
             Window window = ((Activity) getContext()).getWindow();
@@ -186,13 +219,17 @@ public class GestureView extends View implements GestureDetector.OnGestureListen
             } else {
                 currentBrightness = lps.screenBrightness;
             }
-            float brightness = (float) (currentBrightness + percent);
+            float brightness = (float) (currentBrightness + progress/100);
+            if (PlayerConfig.isPrintLog) {
+                Log.i(TAG,"changeBrightness : brightness : "+brightness);
+            }
             if (brightness > 1.0f) {
                 brightness = 1.0f;
             } else if (brightness < 0) {
                 brightness = 0.01f;
             }
             lps.screenBrightness = brightness;
+            window.setAttributes(lps);
             gestureListener.showBrightness((int) (brightness * 100));
         }
     }

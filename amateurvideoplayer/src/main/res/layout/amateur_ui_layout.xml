@@ -169,7 +169,7 @@
     </RelativeLayout>
     <ProgressBar
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:id="@+id/videoplayer_bottom_progress"
         android:layout_alignParentBottom="true"
         style="?android:attr/progressBarStyleHorizontal"

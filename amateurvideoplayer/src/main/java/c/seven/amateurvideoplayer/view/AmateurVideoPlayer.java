@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -37,6 +39,7 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
     private int halfWidth,halfheight;
     private List<VideoBean> videos;
     private int playIndex = 0;
+    private AudioManager audioManager;
     public AmateurVideoPlayer(@NonNull Context context) {
         super(context);
         initView(context);
@@ -60,6 +63,7 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
         uiControlView.setUiControlListener(this);
         mVideoPlayer.setMediaStateListener(uiControlView.getMediaStateListener());
         mGestureView.setGestureListener(this);
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
     public void startPlayer(VideoBean videoBean) {
@@ -233,31 +237,27 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
 
     @Override
     public void showPosition(long position) {
-
+        uiControlView.showPosition(position,mVideoPlayer.getDuration());
     }
 
     @Override
     public void showVolume(int value) {
-
+        uiControlView.showVolume(value);
     }
 
     @Override
     public void showBrightness(int value) {
-
+        uiControlView.showBrightness(value);
     }
 
     @Override
     public void onSingleTap() {
-        if (mVideoPlayer != null && uiControlView != null) {
-            if (mVideoPlayer.isPause() || mVideoPlayer.isPlaying()) {
-                uiControlView.singleTap();
-            }
-        }
+        uiControlView.singleTap();
     }
 
     @Override
     public void onDoubleTap() {
-
+        playClick();
     }
 
     @Override
@@ -270,6 +270,24 @@ public class AmateurVideoPlayer extends FrameLayout implements UIControlListener
 
     @Override
     public int getCurrentVolume() {
-        return 0;
+        return audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+    }
+
+    @Override
+    public void gestureUp() {
+        uiControlView.hideCenter();
+    }
+
+    @Override
+    public boolean gestureEnable() {
+        if (mVideoPlayer != null && (mVideoPlayer.isPause() || mVideoPlayer.isPlaying())) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void gestureSeekTo(long position) {
+        mVideoPlayer.seekTo(position);
     }
 }
