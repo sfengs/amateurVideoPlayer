@@ -268,6 +268,9 @@ public class VideoPlayer extends BaseVideoPlayer {
 
     @Override
     void onError(int what, int extra) {
+        //-19是系统兼容性错误，如3.0以下surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        //what-38说明是没有在prepared里正确调用start
+        //-2147483648是surface没处理好没销毁掉，或者不支持视频编码
         if (what != 38 && extra != -38 && what != -38 && extra != 38 && extra != -19) {
             if (PlayerConfig.isPrintLog) {
                 Log.i(TAG,"what : "+what+", extra : "+extra);
